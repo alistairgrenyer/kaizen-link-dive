@@ -9,7 +9,7 @@ const TTL_SECONDS = 15 * 60; // 15 minutes
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { keyword } = body;
+    const { keyword, location } = body;
 
     if (!keyword) {
       return NextResponse.json(
@@ -29,18 +29,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Set default or use provided location
     const params = {
-      location_code: 2840,     // United States
       language_code: 'en',
       device: 'desktop',
       os: 'windows',
       depth: 20                // request deeper, then take first 10 organic
     };
+    
+    // Use location_name if provided, otherwise default to Ireland
+    if (location) {
+      (params as any).location_name = location;
+    } else {
+      (params as any).location_name = 'Ireland';
+    }
 
     // Allow manual bypass with ?nocache=1
     const noCache = request.nextUrl.searchParams.get('nocache') === '1';
 
-    const cacheKey = `serp:${keyword}|${params.location_code}|${params.language_code}|${params.device}|${params.os}|${params.depth}`;
+    const cacheKey = `serp:${keyword}|${(params as any).location_name}|${params.language_code}|${params.device}|${params.os}|${params.depth}`;
 
     if (!noCache) {
       const cached = cacheGet<{ results: any[] }>(cacheKey);

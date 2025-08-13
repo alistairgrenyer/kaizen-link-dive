@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Search, FileText, Globe, Loader2, Upload } from 'lucide-react';
+import LocationDropdown from '@/components/LocationDropdown';
 
 interface Keyword {
   keyword: string;
@@ -21,6 +22,7 @@ interface FormData {
   campaignName: string;
   campaignUrl: string;
   seedKeywords: string;
+  location: string;
 }
 
 // Initialize test data form fields
@@ -28,7 +30,8 @@ const getTestData = (): FormData => ({
   clientName: 'Chill.ie',
   campaignName: 'The Counties With The Most Affordable Homes',
   campaignUrl: 'https://www.chill.ie/blog/the-counties-with-the-most-affordable-homes/',
-  seedKeywords: 'affordable homes Ireland, cheap houses Ireland, property prices Ireland'
+  seedKeywords: 'affordable homes Ireland, cheap houses Ireland, property prices Ireland',
+  location: 'Ireland'
 });
 
 // Initialize empty form data
@@ -36,7 +39,8 @@ const getEmptyForm = (): FormData => ({
   clientName: '',
   campaignName: '',
   campaignUrl: '',
-  seedKeywords: ''
+  seedKeywords: '',
+  location: ''
 });
 
 export default function Home() {
@@ -44,7 +48,8 @@ export default function Home() {
     clientName: '',
     campaignName: '',
     campaignUrl: '',
-    seedKeywords: ''
+    seedKeywords: '',
+    location: ''
   });
 
   const [keywords, setKeywords] = useState<Keyword[]>([]);
@@ -149,13 +154,18 @@ export default function Home() {
     if (!keyword) return;
 
     setSearchingKeyword(true);
+    setSearchResults([]);
+
     try {
       const response = await fetch('/api/search-serp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ keyword }),
+        body: JSON.stringify({ 
+          keyword,
+          location: formData.location 
+        }),
       });
 
       if (!response.ok) {
@@ -272,16 +282,23 @@ export default function Home() {
                 />
               </div>
               
-              <div>
-                <label htmlFor="seedKeywords" className="block text-sm font-medium text-gray-700 mb-1">Additional Keywords (optional)</label>
+              <div className="mb-4">
+                <label htmlFor="seedKeywords" className="block text-sm font-medium text-gray-700 mb-1">Seed Keywords (optional)</label>
                 <input
                   type="text"
                   id="seedKeywords"
                   name="seedKeywords"
                   value={formData.seedKeywords}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                  placeholder="keyword1, keyword2, keyword3"
+                  placeholder="e.g., property prices, mortgage Ireland"
+                  className="w-full border border-gray-300 rounded-md p-2 text-gray-800"
+                />
+              </div>
+              
+              <div className="mb-4">
+                <LocationDropdown 
+                  selectedLocation={formData.location}
+                  onSelect={(location) => setFormData(prev => ({ ...prev, location }))}
                 />
               </div>
             </div>
