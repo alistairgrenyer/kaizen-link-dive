@@ -27,16 +27,16 @@ export async function POST(request: NextRequest) {
     const form = await request.formData();
     const file = form.get('file') as File | null;
 
-    let clientName = String(form.get('clientName') ?? '');
-    let campaignName = String(form.get('campaignName') ?? '');
-    let campaignUrl = String(form.get('campaignUrl') ?? '');
-    let seedKeywords = String(form.get('seedKeywords') ?? '');
+    const clientName = String(form.get('clientName') ?? '');
+    const campaignName = String(form.get('campaignName') ?? '');
+    const campaignUrl = String(form.get('campaignUrl') ?? '');
+    const seedKeywords = String(form.get('seedKeywords') ?? '');
 
     if (!file) {
       return NextResponse.json({ error: 'No PDF file provided.' }, { status: 400 });
     }
 
-    // ⭐ Lazy-import pdf-parse to avoid ENOENT on some builds
+    // Lazy-import pdf-parse to avoid ENOENT on some builds
     let pdfParse: (buf: Buffer) => Promise<{ text?: string }>;
     try {
       pdfParse = (await import('pdf-parse')).default as any;

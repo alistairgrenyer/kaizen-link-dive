@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, FileText, Globe, Loader2, Upload } from 'lucide-react';
+import { Search, Globe, Loader2, Upload } from 'lucide-react';
 import LocationDropdown from '@/components/LocationDropdown';
 
 interface Keyword {
