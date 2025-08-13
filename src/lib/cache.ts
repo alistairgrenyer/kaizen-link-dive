@@ -24,12 +24,12 @@ function pruneIfNeeded() {
   for (let i = 0; i < toRemove; i++) store.delete(sorted[i][0]);
 }
 
-export function cacheGet<T = any>(key: string): T | null {
+export function cacheGet<T = any>(key: string): T | undefined {
   const e = store.get(key);
-  if (!e) return null;
+  if (!e) return undefined;
   if (e.expiresAt <= now()) {
     store.delete(key);
-    return null;
+    return undefined;
   }
   return e.value as T;
 }
