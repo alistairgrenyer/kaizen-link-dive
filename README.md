@@ -68,6 +68,27 @@ file (required, PDF), clientName?, campaignName?, campaignUrl?, seedKeywords?
 - Errors: Clear messages for missing keys, empty PDFs, and API failures.
 - Caching: SERP results cached for 15 min (in-memory, bypass with ?nocache=1).
 
+## Testing
+
+The app includes Jest tests for core functionality:
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage report
+npm test -- --coverage
+```
+
+Tests cover three key areas:
+
+1. **Text Normalization**: Tests how text extracted from PDFs is processed to fix line breaks, hyphenation, and extra whitespace.
+2. **SERP Mapping**: Tests the transformation of DataForSEO responses to the app's format, ensuring exactly 10 organic results.
+3. **Cache TTL**: Tests the in-memory cache system with proper TTL expiry, hit/miss behavior, and memory management.
+
 ## Project Structure (essentials)
 ```
 src/app/
@@ -79,6 +100,10 @@ src/components/
   LocationDropdown.tsx        # Location selection with fuzzy search
 src/lib/
   cache.ts                    # TTL in-memory cache system
+src/__tests__/
+  text-normalization.test.ts  # Tests for text normalization
+  serp-mapping.test.ts        # Tests for SERP data processing
+  cache-ttl.test.ts           # Tests for caching system
 public/test-data/
   example.pdf                 # (optional demo file)
   locations.json              # DataForSEO location options
