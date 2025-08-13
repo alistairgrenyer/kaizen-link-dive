@@ -1,4 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cacheGet, cacheSet } from '@/lib/cache';
+
+export const runtime = 'nodejs';
+
+// Short-lived TTL for MVP
+const TTL_SECONDS = 15 * 60; // 15 minutes
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,16 +29,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const params = {
+      location_code: 2840,     // United States
+      language_code: 'en',
+      device: 'desktop',
+      os: 'windows',
+      depth: 20                // request deeper, then take first 10 organic
+    };
+
+    // Allow manual bypass with ?nocache=1
+    const noCache = request.nextUrl.searchParams.get('nocache') === '1';
+
+    const cacheKey = `serp:${keyword}|${params.location_code}|${params.language_code}|${params.device}|${params.os}|${params.depth}`;
+
+    if (!noCache) {
+      const cached = cacheGet<{ results: any[] }>(cacheKey);
+      if (cached) {
+        return NextResponse.json(cached, { headers: { 'X-Cache': 'HIT' } });
+      }
+    }
+
     // DataForSEO API endpoint for Google Organic Live results
     const apiUrl = 'https://api.dataforseo.com/v3/serp/google/organic/live/regular';
     
     const requestBody = [{
-      keyword: keyword,
-      location_code: 2840, // United States
-      language_code: 'en',
-      device: 'desktop',
-      os: 'windows',
-      depth: 10 // Get top 10 results
+      keyword,
+      ...params
     }];
 
     const credentials = Buffer.from(`${login}:${password}`).toString('base64');
@@ -68,6 +90,9 @@ export async function POST(request: NextRequest) {
         description: item.description || 'No description available',
         position: index + 1
       }));
+
+    // Save to cache
+    cacheSet(cacheKey, { results }, TTL_SECONDS);
 
     return NextResponse.json({ results });
 

@@ -65,14 +65,17 @@ file (required, PDF), clientName?, campaignName?, campaignUrl?, seedKeywords?
 - PDF parsing: text is normalized (line breaks/hyphens) and capped (~20k chars) before sending to OpenAI.
 - Runtime: API routes run on Node (export const runtime = 'nodejs').
 - Errors: Clear messages for missing keys, empty PDFs, and API failures.
+- Caching: SERP results cached for 15 min (in-memory, bypass with ?nocache=1).
 
 ## Project Structure (essentials)
 ```
 src/app/
   api/
     generate-keywords/route.ts  # PDF → text → OpenAI
-    search-serp/route.ts        # DataForSEO SERP
+    search-serp/route.ts        # DataForSEO SERP + caching
   page.tsx                      # UI: form, PDF upload, results
+src/lib/
+  cache.ts                    # TTL in-memory cache system
 public/test-data/example.pdf    # (optional demo file)
 ```
 
