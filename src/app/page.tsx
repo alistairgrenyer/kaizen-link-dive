@@ -339,7 +339,7 @@ export default function Home() {
                       : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                   }`}
                 >
-                  <div className="font-medium">{keyword.keyword}</div>
+                  <div className="font-medium text-gray-900">{keyword.keyword}</div>
                 </button>
               ))}
             </div>
