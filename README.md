@@ -31,9 +31,10 @@ DATAFORSEO_PASSWORD=********
 ## How to Use
 
 1. Fill in Client/Campaign fields.
-2. Upload a PDF (drag & drop or browse).
-3. Click Generate Keywords → OpenAI returns 15–20 suggestions.
-4. Click a keyword → app calls DataForSEO and shows top 10 results.
+2. Select a location for search results.
+3. Upload a PDF (drag & drop or browse).
+4. Click Generate Keywords → OpenAI returns 15–20 suggestions.
+5. Click a keyword → app calls DataForSEO and shows top 10 results.
 
 ## API
 ### POST /api/generate-keywords
@@ -51,7 +52,7 @@ file (required, PDF), clientName?, campaignName?, campaignUrl?, seedKeywords?
 
 **Body:**
 ```json
-{ "keyword": "..." }
+{ "keyword": "...", "location": "Ireland" }
 ```
 
 **Resp:**
@@ -61,7 +62,7 @@ file (required, PDF), clientName?, campaignName?, campaignUrl?, seedKeywords?
 
 ## Defaults & Notes
 
-- DataForSEO: language_code: "en", location_name: "Ireland", device: "desktop".
+- DataForSEO: language_code: "en", device: "desktop", customizable location via dropdown.
 - PDF parsing: text is normalized (line breaks/hyphens) and capped (~20k chars) before sending to OpenAI.
 - Runtime: API routes run on Node (export const runtime = 'nodejs').
 - Errors: Clear messages for missing keys, empty PDFs, and API failures.
@@ -74,9 +75,13 @@ src/app/
     generate-keywords/route.ts  # PDF → text → OpenAI
     search-serp/route.ts        # DataForSEO SERP + caching
   page.tsx                      # UI: form, PDF upload, results
+src/components/
+  LocationDropdown.tsx        # Location selection with fuzzy search
 src/lib/
   cache.ts                    # TTL in-memory cache system
-public/test-data/example.pdf    # (optional demo file)
+public/test-data/
+  example.pdf                 # (optional demo file)
+  locations.json              # DataForSEO location options
 ```
 
 ## Deploy
